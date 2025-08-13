@@ -1,0 +1,55 @@
+name: Build and Deploy fashion-3d-web
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Extract skeleton
+        run: unzip fashion-3d-web-skeleton-v9.zip -d extracted
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        working-directory: extracted/fashion-3d-web
+        run: pnpm install
+
+      - name: Build web
+        working-directory: extracted/fashion-3d-web
+        run: pnpm -r build
+
+      - name: Upload static site
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: extracted/fashion-3d-web/apps/web/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
