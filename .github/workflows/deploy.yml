@@ -44,12 +44,12 @@ jobs:
         run: pnpm -r build
 
       - name: Upload static site
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v2
         with:
           path: extracted/fashion-3d-web/apps/web/dist
 
-      - name: Deploy to GitHub Pages
+      - name: Deploy to GitHub Page3
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
